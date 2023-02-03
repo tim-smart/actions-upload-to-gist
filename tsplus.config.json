@@ -1,0 +1,8 @@
+{
+  "importMap": {
+    "^(.*)/src/(.*)\\.(ts|js)$": "actions-upload-to-gist/$2"
+  },
+  "traceMap": {
+    "^(.*)/src/(.*)\\.(ts|js)$": "(actions-upload-to-gist) $2"
+  }
+}

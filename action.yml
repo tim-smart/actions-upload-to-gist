@@ -1,0 +1,10 @@
+name: upload-to-gist
+description: 'Create a gist and upload a directory'
+author: 'Tim Smart <hello@timsmart.co>'
+inputs:
+  path:
+    required: true
+    description: 'directory or file to upload'
+runs:
+  using: 'node16'
+  main: 'dist/main.js'
