@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: upload-to-gist
-        uses: tim-smart/actions-upload-to-gist@v2
+        uses: tim-smart/actions-upload-to-gist@v3
         with:
           # API token to access gist service
           token: ${{ secrets.GIST_TOKEN }}
