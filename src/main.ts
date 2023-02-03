@@ -7,6 +7,7 @@ const GitLive = Git.makeLayer({
   userEmail: Config.string("github_actor").map(
     (_) => `${_}@users.noreply.github.com`,
   ),
+  git: Config.succeed({}),
 })
 
 const GithubLive = Github.makeLayer(
@@ -17,7 +18,20 @@ const GithubLive = Github.makeLayer(
 
 const GistLive = (GitLive + GithubLive) >> Gist.GistLive
 
-const program = Gist.Gist.accessWithEffect((_) => _.createAndAdd("tmp"))
+const program = Do(($) => {
+  const gist = $(Gist.Gist.access)
+
+  const { name, path } = $(
+    Config.struct({
+      name: Config.string("name").optional,
+      path: Config.string("path"),
+    }).nested("input").config,
+  )
+
+  const info = $(gist.createAndAdd(path, name.getOrUndefined))
+
+  $(Effect.logInfo(`Created gist: ${info.html_url}`))
+})
 
 program
   .provideLayer(GistLive)

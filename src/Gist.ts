@@ -9,10 +9,10 @@ const make = Do(($) => {
 
   const create = github.wrap((_) => _.gists.create)
 
-  const createBlank = (isPublic = false) =>
+  const createBlank = (name = "Z.EMPTY", isPublic = false) =>
     create({
       files: {
-        ".EMPTY": {
+        [name]: {
           content: "Nothing here yet",
         },
       },
@@ -23,30 +23,26 @@ const make = Do(($) => {
     Do(($) => {
       const dir = $(runner.mkTmpDir(id))
 
-      $(
-        git.run((_) =>
-          _.clone(
-            `https://${github.token.value}@gist.github.com/${id}.git`,
-            dir,
-            { "--depth": 1 },
-          ),
+      return $(
+        git.clone(
+          `https://${github.token.value}@gist.github.com/${id}.git`,
+          dir,
         ),
       )
-
-      return dir
     })
 
   const cloneAndAdd = (id: string, path: string) =>
     Do(($) => {
-      const dir = $(clone(id))
-      $(fs.copyFileOrDir(path, dir))
+      const git = $(clone(id))
+      $(fs.copyFileOrDir(path, git.path))
       $(git.run((_) => _.add(".").commit(`Add ${path}`).push("origin", "main")))
     })
 
-  const createAndAdd = (path: string) =>
+  const createAndAdd = (path: string, name?: string) =>
     Do(($) => {
-      const gist = $(createBlank())
+      const gist = $(createBlank(name))
       $(cloneAndAdd(gist.id!, path))
+      return gist
     })
 
   return { create, createBlank, clone, cloneAndAdd, createAndAdd }

@@ -2,9 +2,15 @@ name: upload-to-gist
 description: 'Create a gist and upload a directory'
 author: 'Tim Smart <hello@timsmart.co>'
 inputs:
+  token:
+    required: true
+    description: 'API token to access gist service'
   path:
     required: true
     description: 'directory or file to upload'
+  name:
+    required: false
+    description: 'name of the gist'
 runs:
   using: 'node16'
   main: 'dist/main.js'
