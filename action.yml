@@ -1,6 +1,9 @@
 name: upload-to-gist
 description: 'Create a gist and upload a directory'
 author: 'Tim Smart <hello@timsmart.co>'
+branding:
+  icon: upload
+  color: blue
 inputs:
   token:
     required: true
