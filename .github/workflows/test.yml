@@ -1,0 +1,19 @@
+# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
+# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
+
+name: Test
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: upload-to-gist
+        uses: tim-smart/actions-upload-to-gist@v2
+        with:
+          # API token to access gist service
+          token: ${{ secrets.GIST_TOKEN }}
+          # directory or file to upload
+          path: src
