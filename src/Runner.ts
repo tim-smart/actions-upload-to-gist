@@ -1,5 +1,6 @@
 import * as OS from "node:os"
 import * as Path from "node:path"
+import { Fs, FsLive } from "./Fs"
 
 export class FsError {
   readonly _tag = "FsError"
@@ -7,7 +8,7 @@ export class FsError {
 }
 
 export const make = Do(($) => {
-  const fs = $(Fs.Fs.access)
+  const fs = $(Fs.access)
   const runnerTemp = $(Config.string("RUNNER_TEMP").optional.config)
   const tmpDir = runnerTemp.getOrElse(OS.tmpdir)
 
@@ -21,4 +22,4 @@ export const make = Do(($) => {
 
 export interface RunnerEnv extends Effect.Success<typeof make> {}
 export const RunnerEnv = Tag<RunnerEnv>()
-export const RunnerEnvLive = Fs.FsLive >> make.toLayer(RunnerEnv)
+export const RunnerEnvLive = FsLive >> make.toLayer(RunnerEnv)

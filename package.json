@@ -1,14 +1,10 @@
 {
   "name": "actions-upload-to-gist",
   "version": "1.0.0",
-  "type": "module",
   "description": "",
   "scripts": {
     "build": "rm -rf dist build *.tsbuildinfo && tsc",
     "package": "pnpm run build && ncc build build/main.js --source-map --license licences.txt"
-  },
-  "exports": {
-    "./*": "./dist/*.js"
   },
   "keywords": [],
   "author": "",

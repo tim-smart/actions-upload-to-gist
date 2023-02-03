@@ -1,11 +1,13 @@
+import { Fs, FsLive } from "./Fs.js"
+import { Git } from "./Git.js"
 import { Github } from "./Github.js"
 import { RunnerEnv, RunnerEnvLive } from "./Runner.js"
 
 const make = Do(($) => {
   const github = $(Github.access)
-  const git = $(Git.Git.access)
+  const git = $(Git.access)
   const runner = $(RunnerEnv.access)
-  const fs = $(Fs.Fs.access)
+  const fs = $(Fs.access)
 
   const create = github.wrap((_) => _.gists.create)
 
@@ -50,4 +52,4 @@ const make = Do(($) => {
 
 export interface Gist extends Effect.Success<typeof make> {}
 export const Gist = Tag<Gist>()
-export const GistLive = (RunnerEnvLive + Fs.FsLive) >> make.toLayer(Gist)
+export const GistLive = (RunnerEnvLive + FsLive) >> make.toLayer(Gist)

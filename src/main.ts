@@ -1,3 +1,6 @@
+import { Gist, GistLive } from "./Gist"
+import * as Git from "./Git"
+import * as Github from "./Github"
 import * as Dotenv from "dotenv"
 
 Dotenv.config()
@@ -16,10 +19,10 @@ const GithubLive = Github.makeLayer(
   }).nested("input"),
 )
 
-const GistLive = (GitLive + GithubLive) >> Gist.GistLive
+const EnvLive = (GitLive + GithubLive) >> GistLive
 
 const program = Do(($) => {
-  const gist = $(Gist.Gist.access)
+  const gist = $(Gist.access)
 
   const { name, path } = $(
     Config.struct({
@@ -34,7 +37,7 @@ const program = Do(($) => {
 })
 
 program
-  .provideLayer(GistLive)
+  .provideLayer(EnvLive)
   .withConfigProvider(ConfigProvider.fromEnv().upperCase)
   .runCallback((exit) => {
     if (exit.isFailure()) {

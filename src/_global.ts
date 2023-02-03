@@ -42,8 +42,3 @@ import type { Duration } from "@fp-ts/data/Duration"
  * @tsplus global
  */
 import { pipe, flow, identity } from "@fp-ts/core/Function"
-
-/**
- * @tsplus global
- */
-import { Fs, Gist, Git, Github, Runner } from "actions-upload-to-gist/_common"
