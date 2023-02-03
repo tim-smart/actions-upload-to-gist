@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: upload-to-gist
-        uses: tim-smart/actions-upload-to-gist@v3
+        uses: tim-smart/actions-upload-to-gist@v1
         with:
           # API token to access gist service
           token: ${{ secrets.GIST_TOKEN }}
