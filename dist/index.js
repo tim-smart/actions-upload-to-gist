@@ -49803,6 +49803,7 @@ const program = tsplus_module_3.flatMap(tsplus_module_3.service(Gist_1.Gist), gi
 tsplus_module_3.runCallback(tsplus_module_3.withConfigProvider(tsplus_module_3.provideLayer(program, EnvLive), tsplus_module_7.upperCase(tsplus_module_7.fromEnv())), (exit) => {
     if (tsplus_module_5.isFailure(exit)) {
         console.log(tsplus_module_6.squash(exit.cause));
+        process.exit(1);
     }
 });
 //# sourceMappingURL=main.js.map

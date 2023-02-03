@@ -42,5 +42,6 @@ program
   .runCallback((exit) => {
     if (exit.isFailure()) {
       console.log(exit.cause.squash)
+      process.exit(1)
     }
   })

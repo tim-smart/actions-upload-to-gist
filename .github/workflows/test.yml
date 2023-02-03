@@ -10,6 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: upload-to-gist
         uses: tim-smart/actions-upload-to-gist@v3
         with:
