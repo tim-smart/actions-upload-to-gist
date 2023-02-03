@@ -16,4 +16,4 @@ inputs:
     description: 'name of the gist'
 runs:
   using: 'node16'
-  main: 'dist/main.js'
+  main: 'dist/index.js'

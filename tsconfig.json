@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "rootDir": "src",
-    "outDir": "dist",
+    "outDir": "build",
     "resolveJsonModule": false,
     "skipLibCheck": true,
     "moduleResolution": "NodeNext",
