@@ -142,11 +142,10 @@ class GitError {
 exports.GitError = GitError;
 exports.GitRepo = tsplus_module_1.Tag();
 const make = ({ git: opts = {}, userName, userEmail }) => {
-    const clone = (url, dir) => tsplus_module_2.map(tsplus_module_2.tryCatchPromise(() => SG.simpleGit(opts).clone(url, dir), (error) => new GitError(error)), () => {
+    const clone = (url, dir) => tsplus_module_2.flatMap(tsplus_module_2.tryCatchPromise(() => SG.simpleGit(opts).clone(url, dir), (error) => new GitError(error)), () => {
         const git = SG.simpleGit(dir, opts);
         const run = (f) => tsplus_module_2.tryCatchPromise(() => f(git), (error) => new GitError(error));
-        run((_) => _.addConfig("user.name", userName).addConfig("user.email", userEmail));
-        return { git, run, path: dir };
+        return tsplus_module_2.map(run((_) => _.addConfig("user.name", userName).addConfig("user.email", userEmail)), () => ({ git, run, path: dir }));
     });
     return { clone };
 };

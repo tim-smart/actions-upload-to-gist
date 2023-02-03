@@ -38,8 +38,10 @@ const make = ({ git: opts = {}, userName, userEmail }: GitConfig) => {
           (error) => new GitError(error as any),
         )
 
-      run((_) =>
-        _.addConfig("user.name", userName).addConfig("user.email", userEmail),
+      $(
+        run((_) =>
+          _.addConfig("user.name", userName).addConfig("user.email", userEmail),
+        ),
       )
 
       return { git, run, path: dir }
