@@ -93,16 +93,18 @@ exports.FsLive = tsplus_module_3.sync(exports.Fs, make);
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GistLive = exports.Gist = void 0;
 const tsplus_module_1 = __nccwpck_require__(1703);
-const tsplus_module_2 = __nccwpck_require__(3736);
-const tsplus_module_3 = __nccwpck_require__(8364);
-const tsplus_module_4 = __nccwpck_require__(2891);
+const tsplus_module_2 = __nccwpck_require__(5369);
+const tsplus_module_3 = __nccwpck_require__(3736);
+const tsplus_module_4 = __nccwpck_require__(8364);
+const tsplus_module_5 = __nccwpck_require__(2891);
 const Fs_js_1 = __nccwpck_require__(4592);
 const Git_js_1 = __nccwpck_require__(5843);
 const Github_js_1 = __nccwpck_require__(8280);
 const Runner_js_1 = __nccwpck_require__(7913);
 const make = tsplus_module_1.flatMap(tsplus_module_1.service(Github_js_1.Github), github => tsplus_module_1.flatMap(tsplus_module_1.service(Git_js_1.Git), git => tsplus_module_1.flatMap(tsplus_module_1.service(Runner_js_1.RunnerEnv), runner => tsplus_module_1.map(tsplus_module_1.service(Fs_js_1.Fs), fs => {
     const create = github.wrap((_) => _.gists.create);
-    const createBlank = (name = "Z.EMPTY", isPublic = false) => tsplus_module_1.map(create({
+    const get = github.wrap((_) => _.gists.get);
+    const createBlank = (name = "ZZZ.txt", isPublic = false) => tsplus_module_1.map(create({
         files: {
             [name]: {
                 content: "Nothing here yet",
@@ -110,13 +112,13 @@ const make = tsplus_module_1.flatMap(tsplus_module_1.service(Github_js_1.Github)
         },
         public: isPublic,
     }), (_) => _.data);
-    const clone = (id) => tsplus_module_1.flatMap(runner.mkTmpDir(id), dir => git.clone(`https://${tsplus_module_2.value(github.token)}@gist.github.com/${id}.git`, dir));
-    const cloneAndAdd = (id, path) => tsplus_module_1.flatMap(clone(id), git => tsplus_module_1.flatMap(fs.copyFileOrDir(path, git.path), () => tsplus_module_1.map(git.run((_) => _.add(".").commit(`Add ${path}`).push("origin", "main")), () => void 0)));
-    const createAndAdd = (path, name) => tsplus_module_1.flatMap(createBlank(name), gist => tsplus_module_1.map(cloneAndAdd(gist.id, path), () => gist));
+    const clone = (id) => tsplus_module_1.flatMap(runner.mkTmpDir(id), dir => git.clone(`https://${tsplus_module_3.value(github.token)}@gist.github.com/${id}.git`, dir));
+    const cloneAndAdd = (id, path) => tsplus_module_1.flatMap(get({ gist_id: id }), gist => tsplus_module_1.flatMap(clone(gist.data.id), git => tsplus_module_1.flatMap(fs.copyFileOrDir(path, git.path), () => tsplus_module_1.map(git.run((_) => _.add(".").commit(`Add ${path}`).push("origin", "main")), () => gist.data))));
+    const createAndAdd = (path, name) => tsplus_module_1.flatMap(createBlank(tsplus_module_2.getOrUndefined(name)), gist => tsplus_module_1.map(cloneAndAdd(gist.id, path), () => gist));
     return { create, createBlank, clone, cloneAndAdd, createAndAdd };
 }))));
-exports.Gist = tsplus_module_3.Tag();
-exports.GistLive = tsplus_module_4.provide(tsplus_module_1.toLayer(make, exports.Gist))((tsplus_module_4.merge(Fs_js_1.FsLive)(Runner_js_1.RunnerEnvLive)));
+exports.Gist = tsplus_module_4.Tag();
+exports.GistLive = tsplus_module_5.provide(tsplus_module_1.toLayer(make, exports.Gist))((tsplus_module_5.merge(Fs_js_1.FsLive)(Runner_js_1.RunnerEnvLive)));
 //# sourceMappingURL=Gist.js.map
 
 /***/ }),
@@ -196,7 +198,7 @@ exports.makeLayer = makeLayer;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.RunnerEnvLive = exports.RunnerEnv = exports.make = exports.FsError = void 0;
+exports.RunnerEnvLive = exports.RunnerEnv = exports.make = void 0;
 const tsplus_module_1 = __nccwpck_require__(1703);
 const tsplus_module_2 = __nccwpck_require__(5369);
 const tsplus_module_3 = __nccwpck_require__(2009);
@@ -205,14 +207,6 @@ const tsplus_module_5 = __nccwpck_require__(2891);
 const OS = __nccwpck_require__(612);
 const Path = __nccwpck_require__(9411);
 const Fs_1 = __nccwpck_require__(4592);
-class FsError {
-    reason;
-    _tag = "FsError";
-    constructor(reason) {
-        this.reason = reason;
-    }
-}
-exports.FsError = FsError;
 exports.make = tsplus_module_1.flatMap(tsplus_module_1.service(Fs_1.Fs), fs => tsplus_module_1.map(tsplus_module_1.config(tsplus_module_3.optional(tsplus_module_3.string("RUNNER_TEMP"))), runnerTemp => {
     const tmpDir = tsplus_module_2.getOrElse(OS.tmpdir)(runnerTemp);
     const mkTmpDir = (path) => {
@@ -49796,9 +49790,10 @@ const GithubLive = Github.makeLayer(tsplus_module_1.nested(tsplus_module_1.struc
 }), "input"));
 const EnvLive = tsplus_module_2.provide(Gist_1.GistLive)((tsplus_module_2.merge(GithubLive)(GitLive)));
 const program = tsplus_module_3.flatMap(tsplus_module_3.service(Gist_1.Gist), gist => tsplus_module_3.flatMap(tsplus_module_3.config(tsplus_module_1.nested(tsplus_module_1.struct({
+    gistId: tsplus_module_1.optional(tsplus_module_1.string("gist_id")),
     name: tsplus_module_1.optional(tsplus_module_1.string("name")),
     path: tsplus_module_1.string("path"),
-}), "input")), ({ name, path }) => tsplus_module_3.flatMap(gist.createAndAdd(path, tsplus_module_4.getOrUndefined(name)), info => tsplus_module_3.map(tsplus_module_3.logInfo(`Created gist: ${info.html_url}`), () => void 0))));
+}), "input")), ({ name, path, gistId }) => tsplus_module_3.flatMap(tsplus_module_4.match(() => gist.createAndAdd(path, name), (id) => gist.cloneAndAdd(id, path))(gistId), info => tsplus_module_3.map(tsplus_module_3.logInfo(`Created gist: ${info.html_url}`), () => void 0))));
 tsplus_module_3.runCallback(tsplus_module_3.withConfigProvider(tsplus_module_3.provideLayer(program, EnvLive), tsplus_module_7.upperCase(tsplus_module_7.fromEnv())), (exit) => {
     if (tsplus_module_5.isFailure(exit)) {
         console.log(tsplus_module_6.squash(exit.cause));
