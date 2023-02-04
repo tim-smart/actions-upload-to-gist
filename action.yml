@@ -11,6 +11,9 @@ inputs:
   path:
     required: true
     description: 'directory or file to upload'
+  gist_id:
+    required: false
+    description: 'id of an existing gist to update'
   name:
     required: false
     description: 'name of the gist'
