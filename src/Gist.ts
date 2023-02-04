@@ -1,3 +1,4 @@
+import type { Option } from "@fp-ts/core/Option"
 import { Fs, FsLive } from "./Fs.js"
 import { Git } from "./Git.js"
 import { Github } from "./Github.js"
@@ -10,8 +11,9 @@ const make = Do(($) => {
   const fs = $(Fs.access)
 
   const create = github.wrap((_) => _.gists.create)
+  const get = github.wrap((_) => _.gists.get)
 
-  const createBlank = (name = "Z.EMPTY", isPublic = false) =>
+  const createBlank = (name = "ZZZ.txt", isPublic = false) =>
     create({
       files: {
         [name]: {
@@ -35,14 +37,16 @@ const make = Do(($) => {
 
   const cloneAndAdd = (id: string, path: string) =>
     Do(($) => {
-      const git = $(clone(id))
+      const gist = $(get({ gist_id: id }))
+      const git = $(clone(gist.data.id!))
       $(fs.copyFileOrDir(path, git.path))
       $(git.run((_) => _.add(".").commit(`Add ${path}`).push("origin", "main")))
+      return gist.data
     })
 
-  const createAndAdd = (path: string, name?: string) =>
+  const createAndAdd = (path: string, name: Option<string>) =>
     Do(($) => {
-      const gist = $(createBlank(name))
+      const gist = $(createBlank(name.getOrUndefined))
       $(cloneAndAdd(gist.id!, path))
       return gist
     })

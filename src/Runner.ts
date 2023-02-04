@@ -2,11 +2,6 @@ import * as OS from "node:os"
 import * as Path from "node:path"
 import { Fs, FsLive } from "./Fs"
 
-export class FsError {
-  readonly _tag = "FsError"
-  constructor(readonly reason: unknown) {}
-}
-
 export const make = Do(($) => {
   const fs = $(Fs.access)
   const runnerTemp = $(Config.string("RUNNER_TEMP").optional.config)

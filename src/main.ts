@@ -24,14 +24,20 @@ const EnvLive = (GitLive + GithubLive) >> GistLive
 const program = Do(($) => {
   const gist = $(Gist.access)
 
-  const { name, path } = $(
+  const { name, path, gistId } = $(
     Config.struct({
+      gistId: Config.string("gist_id").optional,
       name: Config.string("name").optional,
       path: Config.string("path"),
     }).nested("input").config,
   )
 
-  const info = $(gist.createAndAdd(path, name.getOrUndefined))
+  const info = $(
+    gistId.match(
+      () => gist.createAndAdd(path, name),
+      (id) => gist.cloneAndAdd(id, path),
+    ),
+  )
 
   $(Effect.logInfo(`Created gist: ${info.html_url}`))
 })
