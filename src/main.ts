@@ -2,6 +2,8 @@ import { Gist, GistLive } from "./Gist"
 import * as Git from "./Git"
 import * as Github from "./Github"
 import * as Dotenv from "dotenv"
+import * as Core from "@actions/core"
+import { runMain } from "@effect/node/Runtime"
 
 Dotenv.config()
 
@@ -39,15 +41,19 @@ const program = Do(($) => {
     ),
   )
 
-  $(Effect.logInfo(`Created gist: ${info.html_url}`))
+  $(Effect.logInfo(`Gist URL: ${info.html_url}`))
+
+  Core.setOutput("gist_id", info.id!)
+  Core.setOutput("gist_url", info.html_url!)
 })
 
-program
-  .provideLayer(EnvLive)
-  .withConfigProvider(ConfigProvider.fromEnv().upperCase)
-  .runCallback((exit) => {
-    if (exit.isFailure()) {
-      console.log(exit.cause.squash)
-      process.exit(1)
-    }
-  })
+runMain(
+  program
+    .provideLayer(EnvLive)
+    .withConfigProvider(ConfigProvider.fromEnv().upperCase)
+    .catchAllCause((_) =>
+      Effect(() => {
+        console.error(_.squash)
+      }),
+    ),
+)

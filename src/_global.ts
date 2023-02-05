@@ -26,6 +26,11 @@ import type { Layer } from "@effect/io/Layer"
 /**
  * @tsplus global
  */
+import { NodeFs, LiveNodeFs } from "@effect/node/Fs"
+
+/**
+ * @tsplus global
+ */
 import { Chunk } from "@fp-ts/data/Chunk"
 
 /**

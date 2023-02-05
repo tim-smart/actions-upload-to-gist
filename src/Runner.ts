@@ -1,9 +1,9 @@
 import * as OS from "node:os"
 import * as Path from "node:path"
-import { Fs, FsLive } from "./Fs"
+import { LiveNodeFs, NodeFs } from "@effect/node/Fs"
 
 export const make = Do(($) => {
-  const fs = $(Fs.access)
+  const fs = $(NodeFs.access)
   const runnerTemp = $(Config.string("RUNNER_TEMP").optional.config)
   const tmpDir = runnerTemp.getOrElse(OS.tmpdir)
 
@@ -17,4 +17,4 @@ export const make = Do(($) => {
 
 export interface RunnerEnv extends Effect.Success<typeof make> {}
 export const RunnerEnv = Tag<RunnerEnv>()
-export const RunnerEnvLive = FsLive >> make.toLayer(RunnerEnv)
+export const RunnerEnvLive = LiveNodeFs >> make.toLayer(RunnerEnv)
