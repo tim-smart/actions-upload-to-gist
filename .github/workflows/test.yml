@@ -6,15 +6,19 @@ name: Test
 on:
   workflow_dispatch: {}
 
+  pull_request:
+    branches:
+      - "main"
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: upload-to-gist
-        uses: tim-smart/actions-upload-to-gist@v1
+        uses: tim-smart/actions-upload-to-gist@main
         with:
-          # API token to access gist service
-          token: ${{ secrets.GIST_TOKEN }}
-          # directory or file to upload
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          gist_token: ${{ secrets.GIST_TOKEN }}
           path: src
+          pr_comment: true
