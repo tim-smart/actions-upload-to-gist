@@ -43,20 +43,14 @@ const make = <A>(tag: string, schema: Schema<A>) =>
           const [, tagRaw, metaRaw] = $(
             Option.fromNullable(_.body?.match(metaRegex)),
           )
-          console.log({
-            tag,
-            tagRaw,
-          })
 
           // Make sure tag matches
           $(Option.some(tagRaw).filter((_) => _ === tag))
 
           const metaJson = Buffer.from(metaRaw, "base64").toString()
-          console.log(metaJson, JSON.parse(metaJson))
-          console.log(JSON.stringify(schema.decode(JSON.parse(metaJson))))
           const meta = $(
-            Option.fromThrowable(JSON.parse(metaJson)).flatMapEither((_) =>
-              schema.decode(_, { isUnexpectedAllowed: true }),
+            Option.fromThrowable(() => JSON.parse(metaJson)).flatMapEither(
+              (_) => schema.decode(_, { isUnexpectedAllowed: true }),
             ),
           )
 
