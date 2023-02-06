@@ -52,7 +52,7 @@ const program = Do(($) => {
 program
   .provideLayer(EnvLive)
   .withConfigProvider(ConfigProvider.fromEnv().upperCase)
-  .catchAllCause((_) =>
+  .tapErrorCause((_) =>
     Effect(() => {
       console.error(_.squash)
     }),
