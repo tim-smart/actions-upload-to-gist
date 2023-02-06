@@ -21,6 +21,11 @@ inputs:
     required: false
     default: false
     description: "comment on PR with gist URL"
+outputs:
+  gist_id:
+    description: The id of the generated gist
+  gist_url:
+    description: The URL of the deployed content
 runs:
   using: "node16"
   main: "dist/index.js"
