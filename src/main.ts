@@ -1,9 +1,9 @@
-import { Gist, GistLive } from "./Gist"
+import * as Core from "@actions/core"
+import * as Dotenv from "dotenv"
+import * as Gist from "./Gist"
+import { GistDeploy, LiveGistDeploy } from "./GistDeploy"
 import * as Git from "./Git"
 import * as Github from "./Github"
-import * as Dotenv from "dotenv"
-import * as Core from "@actions/core"
-import { runMain } from "@effect/node/Runtime"
 
 Dotenv.config()
 
@@ -15,45 +15,46 @@ const GitLive = Git.makeLayer({
   git: Config.succeed({}),
 })
 
-const GithubLive = Github.makeLayer(
+const GeneralGithubLive = Github.makeLayer(
   Config.struct({
-    token: Config.secret("token"),
+    token: Config.secret("github_token").orElse(Config.secret("gist_token")),
   }).nested("input"),
 )
 
-const EnvLive = (GitLive + GithubLive) >> GistLive
+const GistGithubLive = Github.makeLayer(
+  Config.struct({
+    token: Config.secret("gist_token"),
+  }).nested("input"),
+)
+
+const GistLive = (GitLive + GistGithubLive) >> Gist.GistLive
+
+const EnvLive = (GeneralGithubLive + GistLive) >> LiveGistDeploy
 
 const program = Do(($) => {
-  const gist = $(Gist.access)
+  const deploy = $(GistDeploy.access)
 
-  const { name, path, gistId } = $(
+  const { path, gistId } = $(
     Config.struct({
       gistId: Config.string("gist_id").optional,
-      name: Config.string("name").optional,
       path: Config.string("path"),
     }).nested("input").config,
   )
 
-  const info = $(
-    gistId.match(
-      () => gist.createAndAdd(path, name),
-      (id) => gist.cloneAndAdd(id, path),
-    ),
-  )
+  const [id, url] = $(deploy.upsert(path, gistId))
 
-  $(Effect.logInfo(`Gist URL: ${info.html_url}`))
+  console.log(`Gist URL: ${url}`)
 
-  Core.setOutput("gist_id", info.id!)
-  Core.setOutput("gist_url", info.html_url!)
+  Core.setOutput("gist_id", id)
+  Core.setOutput("gist_url", url)
 })
 
-runMain(
-  program
-    .provideLayer(EnvLive)
-    .withConfigProvider(ConfigProvider.fromEnv().upperCase)
-    .catchAllCause((_) =>
-      Effect(() => {
-        console.error(_.squash)
-      }),
-    ),
-)
+program
+  .provideLayer(EnvLive)
+  .withConfigProvider(ConfigProvider.fromEnv().upperCase)
+  .catchAllCause((_) =>
+    Effect(() => {
+      console.error(_.squash)
+    }),
+  )
+  .runMain()

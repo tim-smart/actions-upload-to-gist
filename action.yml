@@ -1,22 +1,26 @@
 name: upload-to-gist
-description: 'Create a gist and upload a directory'
-author: 'Tim Smart <hello@timsmart.co>'
+description: "Create a gist and upload a directory"
+author: "Tim Smart <hello@timsmart.co>"
 branding:
   icon: upload
   color: blue
 inputs:
-  token:
+  github_token:
+    required: false
+    description: "API token used to update PR comments"
+  gist_token:
     required: true
-    description: 'API token to access gist service'
+    description: "API token used to update Gists"
   path:
     required: true
-    description: 'directory or file to upload'
+    description: "directory or file to upload"
   gist_id:
     required: false
-    description: 'id of an existing gist to update'
-  name:
+    description: "id of an existing gist to update"
+  pr_comment:
     required: false
-    description: 'name of the gist'
+    default: false
+    description: "comment on PR with gist URL"
 runs:
-  using: 'node16'
-  main: 'dist/index.js'
+  using: "node16"
+  main: "dist/index.js"

@@ -62,6 +62,9 @@ MIT
 @fp-ts/data
 MIT
 
+@fp-ts/schema
+MIT
+
 @kwsites/file-exists
 MIT
 The MIT License (MIT)
