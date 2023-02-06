@@ -40,6 +40,10 @@ const make = <A>(tag: string, schema: Schema<A>) =>
     const findComment = issueComments
       .map((_) =>
         Do(($) => {
+          console.log({
+            body: _.body,
+            tag,
+          })
           const [, tagRaw, metaRaw] = $(
             Option.fromNullable(_.body?.match(metaRegex)),
           )
