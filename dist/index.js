@@ -69882,7 +69882,6 @@ Dotenv.config();
 const GitLive = Git.makeLayer({
     userName: tsplus_module_1.string("github_actor"),
     userEmail: tsplus_module_1.map(tsplus_module_1.string("github_actor"), (_) => `${_}@users.noreply.github.com`),
-    git: tsplus_module_1.succeed({}),
 });
 const GeneralGithubLive = Github.makeLayer(tsplus_module_1.nested(tsplus_module_1.struct({
     token: tsplus_module_1.orElse(tsplus_module_1.secret("github_token"), () => tsplus_module_1.secret("gist_token")),
@@ -69895,11 +69894,14 @@ const EnvLive = tsplus_module_2.provide(GistDeploy_1.LiveGistDeploy)((tsplus_mod
 const program = tsplus_module_3.flatMap(tsplus_module_3.service(GistDeploy_1.GistDeploy), deploy => tsplus_module_3.flatMap(tsplus_module_3.config(tsplus_module_1.nested(tsplus_module_1.struct({
     gistId: tsplus_module_1.optional(tsplus_module_1.string("gist_id")),
     path: tsplus_module_1.string("path"),
-}), "input")), ({ path, gistId }) => tsplus_module_3.map(deploy.upsert(path, gistId), ([id, url]) => {
-    console.log(`Gist URL: ${url}`);
-    Core.setOutput("gist_id", id);
-    Core.setOutput("gist_url", url);
-})));
+}), "input")), ({ path, gistId }) => {
+    console.log({ path, gistId });
+    return tsplus_module_3.map(deploy.upsert(path, gistId), ([id, url]) => {
+        console.log(`Gist URL: ${url}`);
+        Core.setOutput("gist_id", id);
+        Core.setOutput("gist_url", url);
+    });
+}));
 tsplus_module_6.runMain(tsplus_module_3.tapErrorCause(tsplus_module_3.withConfigProvider(tsplus_module_3.provideLayer(program, EnvLive), tsplus_module_5.upperCase(tsplus_module_5.fromEnv())), (_) => tsplus_module_3.sync(() => {
     console.error(tsplus_module_4.squash(_));
 })));

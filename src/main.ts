@@ -12,7 +12,6 @@ const GitLive = Git.makeLayer({
   userEmail: Config.string("github_actor").map(
     (_) => `${_}@users.noreply.github.com`,
   ),
-  git: Config.succeed({}),
 })
 
 const GeneralGithubLive = Github.makeLayer(
@@ -40,6 +39,7 @@ const program = Do(($) => {
       path: Config.string("path"),
     }).nested("input").config,
   )
+  console.log({ path, gistId })
 
   const [id, url] = $(deploy.upsert(path, gistId))
 
