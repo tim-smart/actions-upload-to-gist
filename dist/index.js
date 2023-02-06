@@ -293,8 +293,16 @@ exports.RunnerEnvLive = tsplus_module_5.provide(tsplus_module_2.toLayer(exports.
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.nonEmptyString = void 0;
-const tsplus_module_1 = __nccwpck_require__(8579);
-const nonEmptyString = (name) => tsplus_module_1.validate(tsplus_module_1.map(tsplus_module_1.string(name), (_) => _.trim()), "must not be empty", (_) => _ !== "");
+const tsplus_module_1 = __nccwpck_require__(3869);
+const tsplus_module_2 = __nccwpck_require__(3205);
+const tsplus_module_3 = __nccwpck_require__(8579);
+const Error_1 = __nccwpck_require__(5156);
+const nonEmptyString = (name) => tsplus_module_3.mapOrFail(tsplus_module_3.string(name), (_) => {
+    const trimmed = _.trim();
+    return trimmed !== ""
+        ? tsplus_module_1.right(trimmed)
+        : tsplus_module_1.left((0, Error_1.MissingData)(tsplus_module_2.empty(), "must not be empty"));
+});
 exports.nonEmptyString = nonEmptyString;
 //# sourceMappingURL=config.js.map
 
