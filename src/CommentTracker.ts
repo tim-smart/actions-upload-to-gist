@@ -40,23 +40,25 @@ const make = <A>(tag: string, schema: Schema<A>) =>
     const findComment = issueComments
       .map((_) =>
         Do(($) => {
-          console.log({
-            body: _.body,
-            tag,
-          })
           const [, tagRaw, metaRaw] = $(
             Option.fromNullable(_.body?.match(metaRegex)),
           )
+          console.log({
+            tag,
+            tagRaw,
+          })
 
           // Make sure tag matches
           $(Option.some(tagRaw).filter((_) => _ === tag))
 
           const metaJson = Buffer.from(metaRaw, "base64").toString()
+          console.log(metaJson)
           const meta = $(
             Option.fromThrowable(JSON.parse(metaJson)).flatMapEither((_) =>
               schema.decode(_, { isUnexpectedAllowed: true }),
             ),
           )
+          console.log(meta)
 
           return [_, meta] as const
         }),
