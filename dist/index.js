@@ -56382,44 +56382,96 @@ exports.LiveNodeFs = LiveNodeFs;
 
 
 Object.defineProperty(exports, "__esModule", ({
-  value: true
-}));
-exports.runMain = exports.defaultTeardown = void 0;
-var Cause = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/__nccwpck_require__(3391));
-var Effect = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/__nccwpck_require__(5618));
-var Exit = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/__nccwpck_require__(1773));
-var Fiber = /*#__PURE__*/_interopRequireWildcard( /*#__PURE__*/__nccwpck_require__(439));
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+  value: true,
+}))
+exports.runMain = exports.defaultTeardown = void 0
+var Cause = /*#__PURE__*/ _interopRequireWildcard(
+  /*#__PURE__*/ __nccwpck_require__(3391),
+)
+var Effect = /*#__PURE__*/ _interopRequireWildcard(
+  /*#__PURE__*/ __nccwpck_require__(5618),
+)
+var Exit = /*#__PURE__*/ _interopRequireWildcard(
+  /*#__PURE__*/ __nccwpck_require__(1773),
+)
+var Fiber = /*#__PURE__*/ _interopRequireWildcard(
+  /*#__PURE__*/ __nccwpck_require__(439),
+)
+function _getRequireWildcardCache(nodeInterop) {
+  if (typeof WeakMap !== "function") return null
+  var cacheBabelInterop = new WeakMap()
+  var cacheNodeInterop = new WeakMap()
+  return (_getRequireWildcardCache = function (nodeInterop) {
+    return nodeInterop ? cacheNodeInterop : cacheBabelInterop
+  })(nodeInterop)
+}
+function _interopRequireWildcard(obj, nodeInterop) {
+  if (!nodeInterop && obj && obj.__esModule) {
+    return obj
+  }
+  if (obj === null || (typeof obj !== "object" && typeof obj !== "function")) {
+    return { default: obj }
+  }
+  var cache = _getRequireWildcardCache(nodeInterop)
+  if (cache && cache.has(obj)) {
+    return cache.get(obj)
+  }
+  var newObj = {}
+  var hasPropertyDescriptor =
+    Object.defineProperty && Object.getOwnPropertyDescriptor
+  for (var key in obj) {
+    if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) {
+      var desc = hasPropertyDescriptor
+        ? Object.getOwnPropertyDescriptor(obj, key)
+        : null
+      if (desc && (desc.get || desc.set)) {
+        Object.defineProperty(newObj, key, desc)
+      } else {
+        newObj[key] = obj[key]
+      }
+    }
+  }
+  newObj.default = obj
+  if (cache) {
+    cache.set(obj, newObj)
+  }
+  return newObj
+}
 const defaultTeardown = (exit, onExit) => {
-  onExit(Exit.isFailure(exit) && !Cause.isInterruptedOnly(exit.cause) ? 1 : 0);
-};
+  onExit(Exit.isFailure(exit) && !Cause.isInterruptedOnly(exit.cause) ? 1 : 0)
+}
 /**
  * @since 1.0.0
  * @tsplus fluent effect/io/Effect runMain
  */
-exports.defaultTeardown = defaultTeardown;
+exports.defaultTeardown = defaultTeardown
 const runMain = (effect, teardown = defaultTeardown) => {
-  const fiber = Effect.runFork(effect);
-  fiber.unsafeAddObserver(exit => teardown(exit, code => Effect.runCallback(interruptAll(fiber.id()), () => {
-    process.exit(code);
-  })));
+  const fiber = Effect.runFork(effect)
+  fiber.unsafeAddObserver((exit) =>
+    teardown(exit, (code) =>
+      Effect.runCallback(interruptAll(fiber.id()), () => {
+        process.exit(code)
+      }),
+    ),
+  )
   function onSigint() {
-    process.removeListener("SIGINT", onSigint);
-    process.removeListener("SIGTERM", onSigint);
-    Effect.runCallback(fiber.interruptAsFork(fiber.id()));
+    process.removeListener("SIGINT", onSigint)
+    process.removeListener("SIGTERM", onSigint)
+    Effect.runCallback(fiber.interruptAsFork(fiber.id()))
   }
-  process.once("SIGINT", onSigint);
-  process.once("SIGTERM", onSigint);
-};
-exports.runMain = runMain;
-const interruptAll = id => Effect.flatMap(Fiber.roots(), roots => {
-  if (roots.length === 0) {
-    return Effect.unit();
-  }
-  return Fiber.interruptAllWith(roots, id);
-});
+  process.once("SIGINT", onSigint)
+  process.once("SIGTERM", onSigint)
+}
+exports.runMain = runMain
+const interruptAll = (id) =>
+  Effect.flatMap(Fiber.roots(), (roots) => {
+    if (roots.length === 0) {
+      return Effect.unit()
+    }
+    return Fiber.interruptAllWith(roots, id)
+  })
 //# sourceMappingURL=Runtime.js.map
+
 
 /***/ }),
 
@@ -69829,7 +69881,7 @@ const program = tsplus_module_3.flatMap(tsplus_module_3.service(GistDeploy_1.Gis
     Core.setOutput("gist_id", id);
     Core.setOutput("gist_url", url);
 })));
-tsplus_module_6.runMain(tsplus_module_3.catchAllCause(tsplus_module_3.withConfigProvider(tsplus_module_3.provideLayer(program, EnvLive), tsplus_module_5.upperCase(tsplus_module_5.fromEnv())), (_) => tsplus_module_3.sync(() => {
+tsplus_module_6.runMain(tsplus_module_3.tapErrorCause(tsplus_module_3.withConfigProvider(tsplus_module_3.provideLayer(program, EnvLive), tsplus_module_5.upperCase(tsplus_module_5.fromEnv())), (_) => tsplus_module_3.sync(() => {
     console.error(tsplus_module_4.squash(_));
 })));
 //# sourceMappingURL=main.js.map
