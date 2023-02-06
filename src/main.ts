@@ -4,6 +4,7 @@ import * as Gist from "./Gist"
 import { GistDeploy, LiveGistDeploy } from "./GistDeploy"
 import * as Git from "./Git"
 import * as Github from "./Github"
+import { nonEmptyString } from "./utils/config"
 
 Dotenv.config()
 
@@ -35,11 +36,10 @@ const program = Do(($) => {
 
   const { path, gistId } = $(
     Config.struct({
-      gistId: Config.string("gist_id").optional,
-      path: Config.string("path"),
+      gistId: nonEmptyString("gist_id").optional,
+      path: nonEmptyString("path"),
     }).nested("input").config,
   )
-  console.log({ path, gistId })
 
   const [id, url] = $(deploy.upsert(path, gistId))
 

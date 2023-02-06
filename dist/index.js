@@ -286,6 +286,20 @@ exports.RunnerEnvLive = tsplus_module_5.provide(tsplus_module_2.toLayer(exports.
 
 /***/ }),
 
+/***/ 6994:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.nonEmptyString = void 0;
+const tsplus_module_1 = __nccwpck_require__(8579);
+const nonEmptyString = (name) => tsplus_module_1.validate(tsplus_module_1.map(tsplus_module_1.string(name), (_) => _.trim()), "must not be empty", (_) => _ !== "");
+exports.nonEmptyString = nonEmptyString;
+//# sourceMappingURL=config.js.map
+
+/***/ }),
+
 /***/ 9483:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -69878,6 +69892,7 @@ const Gist = __nccwpck_require__(2792);
 const GistDeploy_1 = __nccwpck_require__(7571);
 const Git = __nccwpck_require__(5843);
 const Github = __nccwpck_require__(8280);
+const config_1 = __nccwpck_require__(6994);
 Dotenv.config();
 const GitLive = Git.makeLayer({
     userName: tsplus_module_1.string("github_actor"),
@@ -69892,16 +69907,13 @@ const GistGithubLive = Github.makeLayer(tsplus_module_1.nested(tsplus_module_1.s
 const GistLive = tsplus_module_2.provide(Gist.GistLive)((tsplus_module_2.merge(GistGithubLive)(GitLive)));
 const EnvLive = tsplus_module_2.provide(GistDeploy_1.LiveGistDeploy)((tsplus_module_2.merge(GistLive)(GeneralGithubLive)));
 const program = tsplus_module_3.flatMap(tsplus_module_3.service(GistDeploy_1.GistDeploy), deploy => tsplus_module_3.flatMap(tsplus_module_3.config(tsplus_module_1.nested(tsplus_module_1.struct({
-    gistId: tsplus_module_1.optional(tsplus_module_1.string("gist_id")),
-    path: tsplus_module_1.string("path"),
-}), "input")), ({ path, gistId }) => {
-    console.log({ path, gistId });
-    return tsplus_module_3.map(deploy.upsert(path, gistId), ([id, url]) => {
-        console.log(`Gist URL: ${url}`);
-        Core.setOutput("gist_id", id);
-        Core.setOutput("gist_url", url);
-    });
-}));
+    gistId: tsplus_module_1.optional((0, config_1.nonEmptyString)("gist_id")),
+    path: (0, config_1.nonEmptyString)("path"),
+}), "input")), ({ path, gistId }) => tsplus_module_3.map(deploy.upsert(path, gistId), ([id, url]) => {
+    console.log(`Gist URL: ${url}`);
+    Core.setOutput("gist_id", id);
+    Core.setOutput("gist_url", url);
+})));
 tsplus_module_6.runMain(tsplus_module_3.tapErrorCause(tsplus_module_3.withConfigProvider(tsplus_module_3.provideLayer(program, EnvLive), tsplus_module_5.upperCase(tsplus_module_5.fromEnv())), (_) => tsplus_module_3.sync(() => {
     console.error(tsplus_module_4.squash(_));
 })));
