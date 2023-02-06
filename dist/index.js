@@ -36,11 +36,9 @@ const make = (tag, schema) => tsplus_module_1.flatMap(tsplus_module_1.service(Ru
         });
         return tsplus_module_2.flatMap(() => {
             const metaJson = Buffer.from(metaRaw, "base64").toString();
-            console.log(metaJson);
-            return tsplus_module_2.map(meta => {
-                console.log(meta);
-                return [_, meta];
-            })(tsplus_module_2.flatMapEither((_) => tsplus_module_3.decode(schema)(_, { isUnexpectedAllowed: true }))(tsplus_module_2.fromThrowable(JSON.parse(metaJson))));
+            console.log(metaJson, JSON.parse(metaJson));
+            console.log(JSON.stringify(tsplus_module_3.decode(schema)(JSON.parse(metaJson))));
+            return tsplus_module_2.map(meta => [_, meta])(tsplus_module_2.flatMapEither((_) => tsplus_module_3.decode(schema)(_, { isUnexpectedAllowed: true }))(tsplus_module_2.fromThrowable(JSON.parse(metaJson))));
         })(tsplus_module_2.filter((_) => _ === tag)(tsplus_module_2.some(tagRaw)));
     })(tsplus_module_2.fromNullable(_.body?.match(metaRegex))))(issueComments)));
     const commentMeta = (meta) => {
