@@ -4,26 +4,26 @@ import * as Gist from "./Gist"
 import { GistDeploy, LiveGistDeploy } from "./GistDeploy"
 import * as Git from "./Git"
 import * as Github from "./Github"
-import { nonEmptyString } from "./utils/config"
+import { nonEmptySecret, nonEmptyString } from "./utils/config"
 
 Dotenv.config()
 
 const GitLive = Git.makeLayer({
-  userName: Config.string("github_actor"),
-  userEmail: Config.string("github_actor").map(
+  userName: nonEmptyString("github_actor"),
+  userEmail: nonEmptyString("github_actor").map(
     (_) => `${_}@users.noreply.github.com`,
   ),
 })
 
 const GeneralGithubLive = Github.makeLayer(
   Config.struct({
-    token: Config.secret("github_token").orElse(Config.secret("gist_token")),
+    token: nonEmptySecret("github_token").orElse(nonEmptySecret("gist_token")),
   }).nested("input"),
 )
 
 const GistGithubLive = Github.makeLayer(
   Config.struct({
-    token: Config.secret("gist_token"),
+    token: nonEmptySecret("gist_token"),
   }).nested("input"),
 )
 
