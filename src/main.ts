@@ -11,7 +11,7 @@ Dotenv.config()
 const GitLive = Git.makeLayer({
   userName: nonEmptyString("github_actor"),
   userEmail: nonEmptyString("github_actor").map(
-    (_) => `${_}@users.noreply.github.com`,
+    _ => `${_}@users.noreply.github.com`,
   ),
 })
 
@@ -31,7 +31,7 @@ const GistLive = (GitLive + GistGithubLive) >> Gist.GistLive
 
 const EnvLive = (GeneralGithubLive + GistLive) >> LiveGistDeploy
 
-const program = Do(($) => {
+const program = Do($ => {
   const deploy = $(GistDeploy.access)
 
   const { path, gistId } = $(
@@ -52,7 +52,7 @@ const program = Do(($) => {
 program
   .provideLayer(EnvLive)
   .withConfigProvider(ConfigProvider.fromEnv().upperCase)
-  .tapErrorCause((_) =>
+  .tapErrorCause(_ =>
     Effect(() => {
       console.error(_.squash)
     }),

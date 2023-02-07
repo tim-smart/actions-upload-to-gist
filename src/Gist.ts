@@ -3,14 +3,14 @@ import { Git } from "./Git.js"
 import { Github } from "./Github.js"
 import { RunnerEnv, RunnerEnvLive } from "./Runner.js"
 
-const make = Do(($) => {
+const make = Do($ => {
   const github = $(Github.access)
   const git = $(Git.access)
   const runner = $(RunnerEnv.access)
   const fs = $(Fs.access)
 
-  const create = github.wrap((_) => _.gists.create)
-  const get = github.wrap((_) => _.gists.get)
+  const create = github.wrap(_ => _.gists.create)
+  const get = github.wrap(_ => _.gists.get)
 
   const createBlank = (isPublic = false) =>
     create({
@@ -23,7 +23,7 @@ const make = Do(($) => {
     })
 
   const clone = (id: string) =>
-    Do(($) => {
+    Do($ => {
       const dir = $(runner.mkTmpDir(id))
 
       return $(
@@ -35,16 +35,16 @@ const make = Do(($) => {
     })
 
   const cloneAndAdd = (id: string, path: string) =>
-    Do(($) => {
+    Do($ => {
       const git = $(clone(id))
       $(fs.copyFileOrDir(path, git.path))
-      $(git.run((_) => _.rm(".EMPTY")).ignore)
-      $(git.run((_) => _.add(".").commit(`Add ${path}`).push("origin", "main")))
+      $(git.run(_ => _.rm(".EMPTY")).ignore)
+      $(git.run(_ => _.add(".").commit(`Add ${path}`).push("origin", "main")))
       return $(get({ gist_id: id }))
     })
 
   const createAndAdd = (path: string) =>
-    Do(($) => {
+    Do($ => {
       const gist = $(createBlank())
       $(cloneAndAdd(gist.id!, path))
       return $(get({ gist_id: gist.id! }))

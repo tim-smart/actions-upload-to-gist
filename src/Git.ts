@@ -26,7 +26,7 @@ const make = ({ git: opts = {}, userName, userEmail }: GitConfig) => {
       $(
         Effect.tryCatchPromise(
           () => SG.simpleGit(opts).clone(url, dir),
-          (error) => new GitError(error as any),
+          error => new GitError(error as any),
         ),
       )
 
@@ -35,11 +35,11 @@ const make = ({ git: opts = {}, userName, userEmail }: GitConfig) => {
       const run = <A>(f: (git: SG.SimpleGit) => Promise<A>) =>
         Effect.tryCatchPromise(
           () => f(git),
-          (error) => new GitError(error as any),
+          error => new GitError(error as any),
         )
 
       $(
-        run((_) =>
+        run(_ =>
           _.addConfig("user.name", userName).addConfig("user.email", userEmail),
         ),
       )

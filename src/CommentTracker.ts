@@ -26,7 +26,7 @@ const make = <A>(tag: string, schema: Schema<A>) =>
       Effect.succeed,
     )
 
-    const issueComments = Stream.fromEffect(issueEffect).flatMap((issue) =>
+    const issueComments = Stream.fromEffect(issueEffect).flatMap(issue =>
       gh.stream((_, page) =>
         _.issues.listComments({
           page,
@@ -38,26 +38,26 @@ const make = <A>(tag: string, schema: Schema<A>) =>
     )
 
     const findComment = issueComments
-      .map((_) =>
-        Do(($) => {
+      .map(_ =>
+        Do($ => {
           const [, tagRaw, metaRaw] = $(
             Option.fromNullable(_.body?.match(metaRegex)),
           )
 
           // Make sure tag matches
-          $(Option.some(tagRaw).filter((_) => _ === tag))
+          $(Option.some(tagRaw).filter(_ => _ === tag))
 
           const metaJson = Buffer.from(metaRaw, "base64").toString()
           const meta = $(
-            Option.fromThrowable(() => JSON.parse(metaJson)).flatMapEither(
-              (_) => schema.decode(_, { isUnexpectedAllowed: true }),
+            Option.fromThrowable(() => JSON.parse(metaJson)).flatMapEither(_ =>
+              schema.decode(_, { isUnexpectedAllowed: true }),
             ),
           )
 
           return [_, meta] as const
         }),
       )
-      .flatMap((_) => _.match(() => Stream.empty, Stream.succeed)).runHead
+      .flatMap(_ => _.match(() => Stream.empty, Stream.succeed)).runHead
 
     const commentMeta = (meta: A) => {
       const encoded = schema.encodeOrThrow(meta)
@@ -69,8 +69,8 @@ const make = <A>(tag: string, schema: Schema<A>) =>
       `${commentMeta(meta)}\n${body}`
 
     const createComment = (body: string, meta: A) =>
-      issueEffect.flatMap((issue) =>
-        gh.request((_) =>
+      issueEffect.flatMap(issue =>
+        gh.request(_ =>
           _.issues.createComment({
             owner: issue.owner,
             repo: issue.repo,
@@ -81,8 +81,8 @@ const make = <A>(tag: string, schema: Schema<A>) =>
       )
 
     const updateComment = (id: number, body: string, meta: A) =>
-      issueEffect.flatMap((issue) =>
-        gh.request((_) =>
+      issueEffect.flatMap(issue =>
+        gh.request(_ =>
           _.issues.updateComment({
             owner: issue.owner,
             repo: issue.repo,
@@ -97,7 +97,7 @@ const make = <A>(tag: string, schema: Schema<A>) =>
         _: Option<A>,
       ) => Effect<R, E, readonly [body: string, meta: A, a: T]>,
     ) =>
-      Do(($) => {
+      Do($ => {
         const prev = $(findComment)
         const [body, meta, _] = $(create(prev.map(([, meta]) => meta)))
 

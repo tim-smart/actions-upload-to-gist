@@ -11,7 +11,7 @@ const { Tag: CommentTracker, Live: LiveCommentTracker } = CT.makeLayer(
   meta,
 )
 
-const make = Do(($) => {
+const make = Do($ => {
   const comment = $(CommentTracker.access)
   const gist = $(Gist.access)
 
@@ -36,17 +36,17 @@ const make = Do(($) => {
     id
       .match(
         () => gist.createAndAdd(path),
-        (_) => gist.cloneAndAdd(_, path),
+        _ => gist.cloneAndAdd(_, path),
       )
-      .map((_) => [_.id!, gistUrl(_)] as const)
+      .map(_ => [_.id!, gistUrl(_)] as const)
 
   const upsert = (path: string, fallbackId: Option<string>) =>
     comment
-      .upsert((prevMeta) =>
-        Do(($) => {
+      .upsert(prevMeta =>
+        Do($ => {
           const info = $(
             update(
-              prevMeta.map((_) => _.gistId),
+              prevMeta.map(_ => _.gistId),
               path,
             ),
           )
@@ -56,10 +56,10 @@ const make = Do(($) => {
           return [`Deployed to Gist: ${url}`, { gistId }, info] as const
         }),
       )
-      .catchTag("IssueNotFound", (_) =>
+      .catchTag("IssueNotFound", _ =>
         fallbackId
           .match(() => Effect.fail(_), Effect.succeed)
-          .flatMap((gistId) => update(Option.some(gistId), path)),
+          .flatMap(gistId => update(Option.some(gistId), path)),
       )
 
   return { upsert }

@@ -1,12 +1,9 @@
 lockfileVersion: 5.4
 
-overrides:
-  '@effect/io': 0.1.9
-
 specifiers:
   '@actions/core': ^1.10.0
   '@actions/github': ^5.1.1
-  '@effect/io': 0.1.9
+  '@effect/io': ^0.1.9
   '@effect/node': https://gist.github.com/tim-smart/2249154d563bbbdd603cb09e834361e8/raw/23190141262a1b2113a292bd6ace24191697a8ad/effect-node-0.0.7.tgz
   '@effect/stream': ^0.1.0
   '@fp-ts/core': ^0.1.1

@@ -1,20 +1,21 @@
 import * as Path from "path"
 
-const make = Do(($) => {
+const make = Do($ => {
   const fs = $(NodeFs.access)
 
   const copyDir = (path: string, dest: string) =>
-    Do(($) => {
+    Do($ => {
       const entries = $(fs.readdir(path, { withFileTypes: true }))
-      const files = entries.filter((_) => !_.isDirectory()).map((_) => _.name)
-      const effects = files.map((_) =>
-        fs.copyFile(Path.join(path, _), Path.join(dest, _)),
+      const files = entries.filter(_ => !_.isDirectory()).map(_ => _.name)
+
+      $(
+        files.map(_ => fs.copyFile(Path.join(path, _), Path.join(dest, _)))
+          .collectAllParDiscard,
       )
-      $(Effect.collectAllParDiscard(effects))
     })
 
   const copyFileOrDir = (path: string, dest: string) =>
-    Do(($) => {
+    Do($ => {
       const pathStat = $(fs.stat(path))
 
       $(
