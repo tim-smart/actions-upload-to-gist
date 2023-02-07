@@ -292,10 +292,11 @@ exports.RunnerEnvLive = tsplus_module_5.provide(tsplus_module_2.toLayer(exports.
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.nonEmptyString = void 0;
+exports.nonEmptySecret = exports.nonEmptyString = void 0;
 const tsplus_module_1 = __nccwpck_require__(3869);
 const tsplus_module_2 = __nccwpck_require__(3205);
 const tsplus_module_3 = __nccwpck_require__(8579);
+const tsplus_module_4 = __nccwpck_require__(6350);
 const Error_1 = __nccwpck_require__(5156);
 const nonEmptyString = (name) => tsplus_module_3.mapOrFail(tsplus_module_3.string(name), (_) => {
     const trimmed = _.trim();
@@ -304,6 +305,13 @@ const nonEmptyString = (name) => tsplus_module_3.mapOrFail(tsplus_module_3.strin
         : tsplus_module_1.left((0, Error_1.MissingData)(tsplus_module_2.empty(), "must not be empty"));
 });
 exports.nonEmptyString = nonEmptyString;
+const nonEmptySecret = (name) => tsplus_module_3.mapOrFail(tsplus_module_3.secret(name), (_) => {
+    const trimmed = tsplus_module_4.fromString(tsplus_module_4.value(_).trim());
+    return tsplus_module_4.value(trimmed) !== ""
+        ? tsplus_module_1.right(trimmed)
+        : tsplus_module_1.left((0, Error_1.MissingData)(tsplus_module_2.empty(), "must not be empty"));
+});
+exports.nonEmptySecret = nonEmptySecret;
 //# sourceMappingURL=config.js.map
 
 /***/ }),
@@ -69903,14 +69911,14 @@ const Github = __nccwpck_require__(8280);
 const config_1 = __nccwpck_require__(6994);
 Dotenv.config();
 const GitLive = Git.makeLayer({
-    userName: tsplus_module_1.string("github_actor"),
-    userEmail: tsplus_module_1.map(tsplus_module_1.string("github_actor"), (_) => `${_}@users.noreply.github.com`),
+    userName: (0, config_1.nonEmptyString)("github_actor"),
+    userEmail: tsplus_module_1.map((0, config_1.nonEmptyString)("github_actor"), (_) => `${_}@users.noreply.github.com`),
 });
 const GeneralGithubLive = Github.makeLayer(tsplus_module_1.nested(tsplus_module_1.struct({
-    token: tsplus_module_1.orElse(tsplus_module_1.secret("github_token"), () => tsplus_module_1.secret("gist_token")),
+    token: tsplus_module_1.orElse((0, config_1.nonEmptySecret)("github_token"), () => (0, config_1.nonEmptySecret)("gist_token")),
 }), "input"));
 const GistGithubLive = Github.makeLayer(tsplus_module_1.nested(tsplus_module_1.struct({
-    token: tsplus_module_1.secret("gist_token"),
+    token: (0, config_1.nonEmptySecret)("gist_token"),
 }), "input"));
 const GistLive = tsplus_module_2.provide(Gist.GistLive)((tsplus_module_2.merge(GistGithubLive)(GitLive)));
 const EnvLive = tsplus_module_2.provide(GistDeploy_1.LiveGistDeploy)((tsplus_module_2.merge(GistLive)(GeneralGithubLive)));
