@@ -37,17 +37,17 @@ import type { Stream } from "@effect/stream/Stream"
 /**
  * @tsplus global
  */
-import { Chunk } from "@fp-ts/data/Chunk"
+import { Chunk } from "@effect/data/Chunk"
 
 /**
  * @tsplus global
  */
-import { Tag } from "@fp-ts/data/Context"
+import { Tag } from "@effect/data/Context"
 
 /**
  * @tsplus global
  */
-import type { Duration } from "@fp-ts/data/Duration"
+import type { Duration } from "@effect/data/Duration"
 
 /**
  * @tsplus global

@@ -1,4 +1,5 @@
 import * as Core from "@actions/core"
+import { runMain } from "@effect/node/Runtime"
 import * as Dotenv from "dotenv"
 import * as Gist from "./Gist"
 import { GistDeploy, LiveGistDeploy } from "./GistDeploy"
@@ -49,12 +50,13 @@ const program = Do($ => {
   Core.setOutput("gist_url", url)
 })
 
-program
-  .provideLayer(EnvLive)
-  .withConfigProvider(ConfigProvider.fromEnv().upperCase)
-  .tapErrorCause(_ =>
-    Effect(() => {
-      console.error(_.squash)
-    }),
-  )
-  .runMain()
+runMain(
+  program
+    .provideLayer(EnvLive)
+    .withConfigProvider(ConfigProvider.fromEnv().upperCase)
+    .tapErrorCause(_ =>
+      Effect(() => {
+        console.error(_.squash)
+      }),
+    ),
+)
