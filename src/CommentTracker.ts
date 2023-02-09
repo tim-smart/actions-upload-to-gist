@@ -48,8 +48,9 @@ const make = <A>(tag: string, schema: Schema<A>) =>
           $(Option.some(tagRaw).filter(_ => _ === tag))
 
           const metaJson = Buffer.from(metaRaw, "base64").toString()
+
           const meta = $(
-            Option.fromThrowable(() => JSON.parse(metaJson)).flatMapEither(_ =>
+            Option.liftThrowable(JSON.parse)(metaJson).flatMapEither(_ =>
               schema.decode(_, { isUnexpectedAllowed: true }),
             ),
           )
