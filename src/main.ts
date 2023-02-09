@@ -5,7 +5,7 @@ import * as Gist from "./Gist"
 import { GistDeploy, LiveGistDeploy } from "./GistDeploy"
 import * as Git from "./Git"
 import * as Github from "./Github"
-import { nonEmptySecret, nonEmptyString } from "./utils/config"
+import { input, inputSecret, nonEmptyString } from "./utils/config"
 
 Dotenv.config()
 
@@ -16,17 +16,13 @@ const GitLive = Git.makeLayer({
   ),
 })
 
-const GeneralGithubLive = Github.makeLayer(
-  Config.struct({
-    token: nonEmptySecret("github_token").orElse(nonEmptySecret("gist_token")),
-  }).nested("input"),
-)
+const GeneralGithubLive = Github.makeLayer({
+  token: inputSecret("github_token"),
+})
 
-const GistGithubLive = Github.makeLayer(
-  Config.struct({
-    token: nonEmptySecret("gist_token"),
-  }).nested("input"),
-)
+const GistGithubLive = Github.makeLayer({
+  token: inputSecret("gist_token"),
+})
 
 const GistLive = (GitLive + GistGithubLive) >> Gist.GistLive
 
@@ -35,12 +31,8 @@ const EnvLive = (GeneralGithubLive + GistLive) >> LiveGistDeploy
 const program = Do($ => {
   const deploy = $(GistDeploy.access)
 
-  const { path, gistId } = $(
-    Config.struct({
-      gistId: nonEmptyString("gist_id").optional,
-      path: nonEmptyString("path"),
-    }).nested("input").config,
-  )
+  const path = $(input("path").config)
+  const gistId = $(input("gist_id").optional.config)
 
   const [id, url] = $(deploy.upsert(path, gistId))
 
