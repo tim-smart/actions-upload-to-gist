@@ -17,7 +17,7 @@ const GitLive = Git.makeLayer({
 })
 
 const GeneralGithubLive = Github.makeLayer({
-  token: inputSecret("github_token"),
+  token: inputSecret("github_token").orElse(inputSecret("gist_token")),
 })
 
 const GistGithubLive = Github.makeLayer({
