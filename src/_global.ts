@@ -57,9 +57,9 @@ import type { Schema } from "@fp-ts/schema"
 /**
  * @tsplus global
  */
-import type { Either } from "@fp-ts/core/Either"
+import type { Either } from "@effect/data/Either"
 
 /**
  * @tsplus global
  */
-import { pipe, flow, identity } from "@fp-ts/core/Function"
+import { pipe, flow, identity } from "@effect/data/Function"

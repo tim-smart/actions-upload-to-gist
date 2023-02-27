@@ -1,4 +1,4 @@
-import type { Option } from "@fp-ts/core/Option"
+import type { Option } from "@effect/data/Option"
 import { Gist } from "./Gist"
 import * as CT from "./CommentTracker"
 
