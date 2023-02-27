@@ -71859,7 +71859,7 @@ const GitLive = Git.makeLayer({
     userEmail: tsplus_module_1.map((0, config_1.nonEmptyString)("github_actor"), _ => `${_}@users.noreply.github.com`),
 });
 const GeneralGithubLive = Github.makeLayer({
-    token: (0, config_1.inputSecret)("github_token"),
+    token: tsplus_module_1.orElse((0, config_1.inputSecret)("github_token"), () => (0, config_1.inputSecret)("gist_token")),
 });
 const GistGithubLive = Github.makeLayer({
     token: (0, config_1.inputSecret)("gist_token"),
