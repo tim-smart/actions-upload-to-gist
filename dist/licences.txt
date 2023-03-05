@@ -56,10 +56,10 @@ MIT
 @effect/node
 MIT
 
-@effect/stream
+@effect/schema
 MIT
 
-@fp-ts/schema
+@effect/stream
 MIT
 
 @kwsites/file-exists
