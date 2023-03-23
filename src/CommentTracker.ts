@@ -2,21 +2,49 @@ import type { Option } from "@effect/data/Option"
 import { Github, GithubError } from "./Github.js"
 import { RunnerEnv, RunnerEnvLive } from "./Runner.js"
 
+/**
+ * CommentTracker is for upserting comments to an issue or PR on Github.
+ *
+ * It also supports adding custom metadata from an effect/schema/Schema
+ *
+ * Usage:
+ *
+ * ```ts
+ * import { makeLayer } from "./CommentTracker"
+ *
+ * const metadataSchema = Schema.struct({
+ *   deploymentId: Schema.string
+ * })
+ *
+ * const { CommentTracker, LiveCommentTracker } = makeLayer("DeploymentService", metadataSchema)
+ *
+ * const makeDeploymentService = Do($ => {
+ *   const tracker = $(Effect.service(CommentTracker))
+ *
+ *   $(tracker.upsert((previousMetadata) => Do($ => {
+ *     // TODO: Maybe do something with previous metadata
+ *     return [`Markdown to go into the comment body`, { deploymentId: "123" }, void 0] as const
+ *   })))
+ * })
+ * ```
+ */
+export interface CommentTracker<M> {
+  readonly upsert: <R, E, A>(
+    create: (
+      previousMetadata: Option<M>,
+    ) => Effect<R, E, readonly [body: string, meta: M, a: A]>,
+  ) => Effect<R, E | IssueNotFound | GithubError, A>
+}
+
 export class IssueNotFound {
   readonly _tag = "IssueNotFound"
 }
 
 const metaRegex = /<!-- CommentTracker\((\w+?)\) (\S+) -->/
 
-export interface CommentTracker<M> {
-  readonly upsert: <R, E, A>(
-    create: (
-      prevMeta: Option<M>,
-    ) => Effect<R, E, readonly [body: string, meta: M, a: A]>,
-  ) => Effect<R, E | IssueNotFound | GithubError, A>
-}
+const jsonParse = Option.liftThrowable(JSON.parse)
 
-const make = <A>(tag: string, schema: Schema<A>) =>
+const make = <I extends Json, A>(tag: string, schema: Schema<I, A>) =>
   Do(($): CommentTracker<A> => {
     const env = $(RunnerEnv.access)
     const gh = $(Github.access)
@@ -48,10 +76,9 @@ const make = <A>(tag: string, schema: Schema<A>) =>
           $(Option.some(tagRaw).filter(_ => _ === tag))
 
           const metaJson = Buffer.from(metaRaw, "base64").toString()
-
           const meta = $(
-            Option.liftThrowable(JSON.parse)(metaJson).flatMapEither(_ =>
-              schema.decode(_, { isUnexpectedAllowed: true }),
+            jsonParse(metaJson).flatMapEither(_ =>
+              schema.parseEither(_, { isUnexpectedAllowed: true }),
             ),
           )
 
@@ -61,7 +88,7 @@ const make = <A>(tag: string, schema: Schema<A>) =>
       .flatMap(_ => _.match(() => Stream.empty, Stream.succeed)).runHead
 
     const commentMeta = (meta: A) => {
-      const encoded = schema.encodeOrThrow(meta)
+      const encoded = schema.encode(meta)
       const b64Meta = Buffer.from(JSON.stringify(encoded)).toString("base64")
       return `<!-- CommentTracker(${tag}) ${b64Meta} -->`
     }
@@ -115,12 +142,16 @@ const make = <A>(tag: string, schema: Schema<A>) =>
     return { upsert }
   })
 
-export const makeLayer = <A>(tag: string, schema: Schema<A>) => {
-  const serviceTag = Tag<CommentTracker<A>>()
-  const Live = RunnerEnvLive >> make(tag, schema).toLayer(serviceTag)
+export const makeLayer = <I extends Json, A>(
+  tag: string,
+  schema: Schema<I, A>,
+) => {
+  const CommentTracker = Tag<CommentTracker<A>>()
+  const LiveCommentTracker =
+    RunnerEnvLive >> make(tag, schema).toLayer(CommentTracker)
 
   return {
-    Tag: serviceTag,
-    Live,
+    CommentTracker,
+    LiveCommentTracker,
   } as const
 }

@@ -6,10 +6,7 @@ const meta = Schema.struct({
   gistId: Schema.string,
 })
 
-const { Tag: CommentTracker, Live: LiveCommentTracker } = CT.makeLayer(
-  "GistDeploy",
-  meta,
-)
+const { CommentTracker, LiveCommentTracker } = CT.makeLayer("GistDeploy", meta)
 
 const make = Do($ => {
   const comment = $(CommentTracker.access)
