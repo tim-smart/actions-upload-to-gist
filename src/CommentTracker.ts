@@ -2,32 +2,6 @@ import type { Option } from "@effect/data/Option"
 import { Github, GithubError } from "./Github.js"
 import { RunnerEnv, RunnerEnvLive } from "./Runner.js"
 
-/**
- * CommentTracker is for upserting comments to an issue or PR on Github.
- *
- * It also supports adding custom metadata from an effect/schema/Schema
- *
- * Usage:
- *
- * ```ts
- * import { makeLayer } from "./CommentTracker"
- *
- * const metadataSchema = Schema.struct({
- *   deploymentId: Schema.string
- * })
- *
- * const { CommentTracker, LiveCommentTracker } = makeLayer("DeploymentService", metadataSchema)
- *
- * const makeDeploymentService = Do($ => {
- *   const tracker = $(Effect.service(CommentTracker))
- *
- *   $(tracker.upsert((previousMetadata) => Do($ => {
- *     // TODO: Maybe do something with previous metadata
- *     return [`Markdown to go into the comment body`, { deploymentId: "123" }, void 0] as const
- *   })))
- * })
- * ```
- */
 export interface CommentTracker<M> {
   readonly upsert: <R, E, A>(
     create: (
